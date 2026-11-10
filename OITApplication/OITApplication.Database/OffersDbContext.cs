@@ -7,7 +7,7 @@ namespace OITApplication.Database
 {
     public class OffersDbContext : DbContext
     {
-        public OffersDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        public OffersDbContext(DbContextOptions<OffersDbContext> options) : base(options)
         {
         }
 

@@ -7,6 +7,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Storage.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace OITApplication
 {
@@ -35,6 +38,11 @@ namespace OITApplication
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlite("Data Source=users.db");
+            });
+
+            builder.Services.AddDbContext<OffersDbContext>(options =>
+            {
+                options.UseSqlite("Data Source=offers.db");
             });
 
 
@@ -122,13 +130,49 @@ namespace OITApplication
                 return Results.BadRequest("такой пользователь уже существует.");
             });
 
-            app.MapPost("/createOffer", (IFormFile image) =>
+            app.MapPost("/createOffer", ([AsParameters]OfferRequest offer, OffersDbContext offersDb) =>
             {
-                Console.WriteLine(image.FileName);
+                byte[] image;
+                using(var stream = new MemoryStream())
+                {
+                    offer.Image.CopyTo(stream);
+                    image = stream.ToArray();
+                }
+
+                Offer o = new Offer(offer.Name, offer.Label, image);
+                offersDb.Offers.Add(o);
+                offersDb.SaveChanges();
+
                 return Results.Ok();
+
+
             }).DisableAntiforgery();
+
+            app.MapGet("/searchOffers", (OffersDbContext offersDb, string line = "") =>
+            {
+                List<Offer> result;
+
+                if (string.IsNullOrEmpty(line))
+                {
+                    result = offersDb.Offers.ToList();
+                    return Results.Json(result);
+                }
+
+                result = offersDb.Offers.Where(o => o.Name != null && o.Name.Contains(line)).ToList();
+
+
+                return Results.Json(result);
+            });
 
             app.Run();
         }
     }
+
+    class OfferRequest
+    {
+        [FromForm]public string? Name {  get; set; }
+        [FromForm]public string? Label { get; set; }
+        [FromForm]public IFormFile? Image { get; set; }
+    }
 }
+    

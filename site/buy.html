@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="./style/header.css">
     <link rel="stylesheet" href="./style/buy.css">
     <link rel="stylesheet" href="./style/footer.css">
+
+
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap">
 </head>
 <body>
     <header class="head">
@@ -30,13 +35,17 @@
         <p>Забронювати будинок</p>
     </article>
     <section class="main">
-        <article>
-            <input class="search" type="text">
-        </article>
+        <input id="line" class="search" type="text">
+        <button onclick="search(event)">Шукати</button>
+        <button onclick="toCreate(event)">Створити</button>
+    </section>
+
+    <section id="offers" class="offers">
+        
     </section>
 
     <footer><p>&copy; 2021 Holiday time. All rights reserved</p></footer>
 </body>
 
-<script src="./scripts/buy.js"></script>
+<script src="./scripts/offerList.js"></script>
 </html>
